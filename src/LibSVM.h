@@ -1,5 +1,4 @@
-#include "common.h"
-#include "svm.h"
+#pragma once
 
 //libsvm
 typedef struct svm_problem SVMProblem;

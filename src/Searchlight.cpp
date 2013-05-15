@@ -1,9 +1,16 @@
-#include "Searchlight.h"
+#include <iostream>
+#include <fstream>
+#include <algorithm>
+#include "common.h"
+#include "svm.h"
+#include "LibSVM.h"
 #include "SVMClassification.h"
 #include "Classification.h"   // for distance ratio
 #include "Scheduler.h"
 #include "Preprocessing.h"    // for z-score across blocks within subjects
-#include "common.h"
+#include "Searchlight.h"
+
+using namespace std;
 
 // don't forget shift 2!!
 
@@ -97,7 +104,7 @@ SVMProblem* GetSearchlightSVMProblem(RawMatrix** avg_matrices, Trial* trials, in
       int offset = (trials[i].sc-5)/20; //ad hoc here, for this dataset only!!!!
       if (voxels[j]!=-1)
       {
-        prob->x[i][j].value = avg_matrices[sid]->matrix[voxels[j]*col+offset];
+		prob->x[i][j].value = static_cast<float>(avg_matrices[sid]->matrix[voxels[j]*col+offset]);
       }
       else
       {

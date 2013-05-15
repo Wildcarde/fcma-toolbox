@@ -1,24 +1,8 @@
-#ifndef COMMON_H
-#define COMMON_H
+#pragma once
 
-// head files
-#include <vector>
-#include <map>
-#include <algorithm>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <iostream>
-#include <fstream>
-#include <cstdlib>
-#include <cstring>
-#include <cmath>
-//#include <omp.h>
-#include <iomanip>
-
-using namespace std;
+#include <string>
+#define OMPI_SKIP_MPICXX
+#include <mpi.h>
 
 // Matrix multiplication parameters
 #define MAXTRIAL 10000
@@ -30,7 +14,7 @@ typedef unsigned short uint16;
 
 typedef struct raw_matrix_t
 {
-  string sname;  // subject name (file name without extension)
+  std::string sname;  // subject name (file name without extension)
   int sid;  // subject id
   int row;
   int col;
@@ -99,5 +83,3 @@ extern unsigned long long counter;
 #define LENGTHTAG 2
 #define VOXELCLASSIFIERTAG 3
 #define ELAPSETAG 4
-
-#endif

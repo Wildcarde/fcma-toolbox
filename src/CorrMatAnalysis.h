@@ -1,4 +1,4 @@
-#include "common.h"
+#pragma once
 
 VoxelScore* GetCorrVecSum(int me, CorrMatrix** c_matrices, int nTrials);
 float AllTrialsCorrVecSum(int nTrials, int startIndex, CorrMatrix** c_matrices, int length);

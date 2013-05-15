@@ -1,4 +1,5 @@
-#include <mpi.h>
+#include <string>
+#include <iostream>
 #include "common.h"
 #include "Preprocessing.h"
 #include "Scheduler.h"
@@ -6,6 +7,8 @@
 #include "SVMPredictorWithMasks.h"
 #include "Searchlight.h"
 #include "svm.h"
+
+using namespace std;
 
 Param Parameters;
 //extern unsigned long long counter;

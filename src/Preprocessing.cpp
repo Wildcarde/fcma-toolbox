@@ -1,10 +1,15 @@
-#include "Preprocessing.h"
-#include "common.h"
-#include <zlib.h>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <algorithm>
+#include <nifti1_io.h>
 #undef __USE_BSD
 #include <dirent.h>
-#include <sstream>
-#include <nifti1_io.h>
+#include <zlib.h>
+#include "common.h"
+#include "Preprocessing.h"
+
+using namespace std;
 
 /*************************
 read a bunch of raw matrix files
@@ -189,7 +194,7 @@ int AlignMatrices(RawMatrix** r_matrices, int nSubs, Point* pts)
 {
   // align multi-subjects, remove all-zero voxels, assume that all subjects have the same number of voxels  
   int row = r_matrices[0]->row;
-  bool flags[row];  // can use a variable to define an array
+  bool* flags = new bool[row];  // can use a variable to define an array
   int i, j, k;
   for (i=0; i<row; i++)
   {
@@ -257,6 +262,7 @@ int AlignMatrices(RawMatrix** r_matrices, int nSubs, Point* pts)
   fwrite((void*)pts, sizeof(int), 3*count, fp);
   fclose(fp);
   exit(1);*/
+  delete [] flags;
   return count;
 }
 
@@ -410,9 +416,9 @@ Trial* GenRegularTrials(int nSubs, int nShift, int& nTrials, const char* file)
   int nPerSubs = -1;
   ifile>>nPerSubs;
   Trial* trials = new Trial[nSubs*nPerSubs];  //12 trials per subject
-  int trial_labels[nPerSubs];// = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
-  int scs[nPerSubs];// = {4, 24, 44, 64, 84, 104, 124, 144, 164, 184, 204, 224};
-  int ecs[nPerSubs];// = {15, 35, 55, 75, 95, 115, 135, 155, 175, 195, 215, 235};
+  int* trial_labels = new int[nPerSubs];// = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+  int* scs = new int[nPerSubs];// = {4, 24, 44, 64, 84, 104, 124, 144, 164, 184, 204, 224};
+  int* ecs = new int[nPerSubs];// = {15, 35, 55, 75, 95, 115, 135, 155, 175, 195, 215, 235};
   //int trial_labels[6] = {0, 1, 0, 1, 0, 1};
   //int scs[6] = {4, 24, 84, 104, 164, 184};
   //int ecs[6] = {15, 35, 95, 115, 175, 195};
@@ -448,6 +454,9 @@ Trial* GenRegularTrials(int nSubs, int nShift, int& nTrials, const char* file)
       }
     }
   }
+  delete [] trial_labels;
+  delete [] scs;
+  delete [] ecs;
   nTrials = nSubs * nPerSubs;
   return trials;
 }
@@ -488,9 +497,9 @@ Trial* GenBlocksFromDir(int nSubs, int nShift, int& nTrials, RawMatrix** r_matri
     }
     int nPerSubs = -1;
     ifile>>nPerSubs;
-    int trial_labels[nPerSubs];
-    int scs[nPerSubs];
-    int ecs[nPerSubs];
+	int* trial_labels = new int[nPerSubs];
+	int* scs = new int[nPerSubs];
+	int* ecs = new int[nPerSubs];
     for (j=0; j<nPerSubs; j++)
     {
       ifile>>trial_labels[j]>>scs[j]>>ecs[j];
@@ -502,9 +511,12 @@ Trial* GenBlocksFromDir(int nSubs, int nShift, int& nTrials, RawMatrix** r_matri
       index++;
     }
     ifile.close();
+	delete [] trial_labels;
+	delete [] scs;
+	delete [] ecs;
     nTrials += nPerSubs;
   }
-  return trials;
+   return trials;
 }
 
 /*********************************
@@ -514,7 +526,7 @@ output: the leave-out subject's data is put to the tail of the trial array
 **********************************/
 void leaveSomeTrialsOut(Trial* trials, int nTrials, int tid, int nLeaveOut)
 {
-  Trial temp[nLeaveOut];
+  Trial* temp = new Trial[nLeaveOut];
   int i, newIndex=0, count=0;
   for (i=0; i<nTrials; i++)
   {
@@ -535,6 +547,7 @@ void leaveSomeTrialsOut(Trial* trials, int nTrials, int tid, int nLeaveOut)
     trials[i] = temp[count];
     count++;
   }
+  delete [] temp;
 }
 
 /****************************************
@@ -548,10 +561,11 @@ void corrMatPreprocessing(CorrMatrix** c_matrices, int n, int nSubs)
   int col = c_matrices[0]->nVoxels; // assume that all correlation matrices have the same size
   int i;
   #pragma omp parallel for private(i)
+  double* buf = new double[n];
   for (i=0; i<row*col; i++)
   {
-    double buf[n];
-    int j, k;
+	 memset(buf,0,n*sizeof(double));
+     int j, k;
     // need to do RT regression and get z-scored subject by subject
     for (k=0; k<nSubs; k++)
     {
@@ -573,7 +587,7 @@ void corrMatPreprocessing(CorrMatrix** c_matrices, int n, int nSubs)
         }
       }*/
       for (j=0; j<count; j++)
-        buf[j] = fisherTransformation(buf[j]);
+        buf[j] = static_cast<float>( fisherTransformation(buf[j]) );
       z_score(buf, count);
       count = 0;
       for (j=0; j<n; j++)
@@ -586,6 +600,7 @@ void corrMatPreprocessing(CorrMatrix** c_matrices, int n, int nSubs)
       }
     }
   }
+  delete [] buf;
 }
 
 /****************************************
@@ -598,14 +613,14 @@ float fisherTransformation(float v)
   float f1 = 1+v;
   if (f1<=0.0)
   {
-    f1 = TINYNUM;
+    f1 = static_cast<float>( TINYNUM );
   }
   float f2 = 1-v;
   if (f2<=0.0)
   {
-    f2 = TINYNUM;
+    f2 = static_cast<float>( TINYNUM );
   }
-  return 0.5 * logf(f1/f2);
+  return static_cast<float>( 0.5 * logf(f1/f2) );
 }
 
 /***************************************

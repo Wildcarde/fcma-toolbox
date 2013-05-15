@@ -1,6 +1,9 @@
-#include "SVMClassification.h"
-#include "LibSVM.h"
+#include <iostream>
+#include <cblas.h>
 #include "common.h"
+#include "svm.h"
+#include "SVMClassification.h"
+using namespace std;
 
 /****************************************
 get the SVM results of classifying correlation vectors of two categories for every voxel
@@ -103,7 +106,7 @@ SVMProblem* GetSVMProblemWithPreKernel(CorrMatrix** c_matrices, int row, int sta
     prob->y[i] = c_matrices[i]->tlabel;
     prob->x[i] = new SVMNode[nTrainings+2];
     prob->x[i][0].index = 0;
-    prob->x[i][0].value = i+1;
+    prob->x[i][0].value = static_cast<float>( i+1 );
     for (j=0; j<nTrainings; j++)
     {
       prob->x[i][j+1].index = j+1;
@@ -138,5 +141,5 @@ float DoSVM(int nFolds, SVMProblem* prob, SVMParameter* param)
   }
   //cout<<total_correct<<" "<<prob->l; getchar();
   delete target;
-  return 1.0*total_correct/prob->l;
+  return static_cast<float>( 1.0*total_correct/prob->l );
 }

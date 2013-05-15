@@ -1,3 +1,5 @@
+#include "common.h"
+#include "svm.h"
 #include "LibSVM.h"
 
 void print_null(const char* s) {s='\0';/*cheat the compiler*/} // for SVM print quietly

@@ -1,5 +1,12 @@
-#include "MatComputation.h"
 #include "common.h"
+#ifdef USE_MKL
+#include <mkl_cblas.h>
+#else
+extern "C" {
+#include <cblas.h>
+}
+#endif
+#include "MatComputation.h"
 
 /*****************************
 normalize the 64-bit double to 32-bit float matrix, to z-score the numbers

@@ -1,9 +1,4 @@
-#include "common.h"
-#include "svm.h"
-
-typedef struct svm_problem SVMProblem;
-typedef struct svm_parameter SVMParameter;
-typedef struct svm_node SVMNode;
+#pragma once
 
 void Searchlight(RawMatrix** avg_matrices, int nSubs, Trial* trials, int nTrials, int nTests, int nFolds, Point* pts, const char* topVoxelFile, const char* maskFile);
 VoxelScore* GetSearchlightSVMPerformance(RawMatrix** avg_matrices, Trial* trials, int nTrials, int nTests, int nFolds, Point* pts);

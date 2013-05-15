@@ -1,4 +1,4 @@
-#include "common.h"
+#pragma once
 #include "LibSVM.h"
 
 void SVMPredict(RawMatrix** r_matrices, RawMatrix** avg_matrices, int nSubs, int nTrials, Trial* trials, int nTests, int taskType, const char* topVoxelFile, const char* mask_file);
@@ -9,5 +9,5 @@ void RearrangeMatrix(RawMatrix** r_matrices, VoxelScore* scores, int row, int co
 float* GetInnerSimMatrix(int row, int col, int nSubs, int nTrials, Trial* trials, RawMatrix** r_matrices);
 float* GetPartialInnerSimMatrix(int row, int col, int nSubs, int nTrials, int sr, int rowLength, Trial* trials, RawMatrix** r_matrices);
 void GetDotProductUsingMatMul(float* simMatrix, float* values, int nTrials, int nVoxels, int lengthPerCorrVector);
-void NormalizeCorrValues(float* values, int nTrials, int nVoxels, int lengthPerCorrVector, int nSubs);
+void NormalizeCorrValues(float* values, const int nTrials, const int nVoxels, const int lengthPerCorrVector, const int nSubs);
 SVMProblem* GetSVMTrainingSet(float* simMatrix, int nTrials, Trial* trials, int nTrainings);

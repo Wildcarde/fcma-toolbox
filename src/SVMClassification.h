@@ -1,4 +1,4 @@
-#include "common.h"
+#pragma once
 #include "LibSVM.h"
 
 VoxelScore* GetSVMPerformance(int me, CorrMatrix** c_matrices, int nTrainings, int nFolds);

@@ -1,16 +1,8 @@
-#include <cstring>
-#include "common.h"
-#ifdef USE_MKL
-#include <mkl_cblas.h>
-#else
-extern "C" {
-#include <cblas.h>
-}
-#endif
+#pragma once
 
 RawMatrix** ReadGzDirectory(const char* filepath, const char* filetype, int& nSubs);
-RawMatrix* ReadGzData(string fileStr, int sid);
-RawMatrix* ReadNiiGzData(string fileStr, int sid);
+RawMatrix* ReadGzData(std::string fileStr, int sid);
+RawMatrix* ReadNiiGzData(std::string fileStr, int sid);
 int AlignMatrices(RawMatrix** r_matrices, int nSubs, Point* pts);
 int AlignMatricesByFile(RawMatrix** r_matrices, int nSubs, const char* file, Point* pts);
 RawMatrix** GetMaskedMatrices(RawMatrix** r_matrices, int nSubs, const char* maskFile);

@@ -1,11 +1,15 @@
-#include <mpi.h>
-#include "Scheduler.h"
+#include <iostream>
+#include <algorithm>
+#include <fstream>
 #include "common.h"
 #include "MatComputation.h"
 #include "CorrMatAnalysis.h"
 #include "Classification.h"
 #include "Preprocessing.h"
 #include "SVMClassification.h"
+#include "Scheduler.h"
+
+using namespace std;
 
 void Scheduler(int me, int nprocs, int step, RawMatrix** r_matrices, int taskType, Trial* trials, int nTrials, int nHolds, int nSubs, int nFolds, const char* output_file, const char* mask_file1, const char* mask_file2)
 {

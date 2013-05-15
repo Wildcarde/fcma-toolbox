@@ -1,9 +1,12 @@
+#include <fstream>
+#include <cblas.h>
 #include "common.h"
-#include "SVMPredictor.h"
 #include "MatComputation.h"
-#include "LibSVM.h"
+#include <iostream>
 #include "Preprocessing.h"
-//#include "Searchlight.h"
+#include "svm.h"
+#include "SVMPredictor.h"
+using namespace std;
 
 /***************************************
 predict a new sample based on a trained SVM model and a variation of the numbers of top voxels. if correlation, assume that it's a self correlation, so only one mask file is enough
@@ -74,7 +77,7 @@ void CorrelationBasedClassification(int* tops, int nSubs, int nTrials, Trial* tr
     for (j=nTrainings; j<nTrials; j++)
     {
       x[0].index = 0;
-      x[0].value = j-nTrainings+1;
+      x[0].value = static_cast<float>( j-nTrainings+1 );
       for (k=0; k<nTrainings; k++)
       {
         x[k+1].index = k+1;
@@ -129,7 +132,7 @@ void ActivationBasedClassification(int* tops, int nTrials, Trial* trials, int nT
         prob->x[j][k].index = k+1;
         int col = avg_matrices[sid]->col;
         int offset = (trials[j].sc-5)/20; //ad hoc here, for this dataset only!!!!
-        prob->x[j][k].value = avg_matrices[sid]->matrix[k*col+offset];
+        prob->x[j][k].value = static_cast<float>(avg_matrices[sid]->matrix[k*col+offset] );
       }
       prob->x[j][k].index = -1;
     }
@@ -144,7 +147,7 @@ void ActivationBasedClassification(int* tops, int nTrials, Trial* trials, int nT
         x[k].index = k+1;
         int col = avg_matrices[sid]->col;
         int offset = (trials[j].sc-5)/20; //ad hoc here, for this dataset only!!!!
-        x[k].value = avg_matrices[sid]->matrix[k*col+offset];
+        x[k].value = static_cast<float>( avg_matrices[sid]->matrix[k*col+offset] );
       }
       x[k].index = -1;
       double predict_label = svm_predict(model, x);
@@ -280,7 +283,7 @@ void NormalizeCorrValues(float* values, int nTrials, int nVoxels, int lengthPerC
 {
   int length = nVoxels*lengthPerCorrVector;
   int trialsPerSub = nTrials / nSubs; // should be dividable
-  double buf[trialsPerSub];
+  double* buf = new double[trialsPerSub];
   int i, j, k;
   for (i=0; i<nSubs; i++) // do normalization subject by subject
   {
@@ -293,10 +296,11 @@ void NormalizeCorrValues(float* values, int nTrials, int nVoxels, int lengthPerC
       z_score(buf, trialsPerSub);
       for (k=0; k<trialsPerSub; k++)
       {
-        values[i*trialsPerSub*length+k*length+j] = buf[k];
+        values[i*trialsPerSub*length+k*length+j] = static_cast<float>( buf[k] );
       }
     }
   }
+  delete [] buf;
 }
 
 /****************************
@@ -316,7 +320,7 @@ SVMProblem* GetSVMTrainingSet(float* simMatrix, int nTrials, Trial* trials, int 
     prob->y[i] = trials[i].label;
     prob->x[i] = new SVMNode[nTrainings+2];
     prob->x[i][0].index = 0;
-    prob->x[i][0].value = i+1;
+    prob->x[i][0].value = static_cast<float>( i+1 );
     for (j=0; j<nTrainings; j++)
     {
       prob->x[i][j+1].index = j+1;

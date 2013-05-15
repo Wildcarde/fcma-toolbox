@@ -1,4 +1,4 @@
-#include "common.h"
+#pragma once
 
 VoxelScore* GetDistanceRatio(int me, CorrMatrix** c_matrices, int nTrials);
 float DoDistanceRatioSmarter(int nTrainings, int startIndex, CorrMatrix** c_matrices, int length);

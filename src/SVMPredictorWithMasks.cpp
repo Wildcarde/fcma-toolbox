@@ -1,10 +1,15 @@
+#include <nifti1_io.h>
+#include <iostream>
+#include <cblas.h>
 #include "common.h"
-#include "SVMPredictorWithMasks.h"
+#include "svm.h"
 #include "MatComputation.h"
 #include "LibSVM.h"
 #include "Preprocessing.h"
 #include "SVMPredictor.h"
-#include <nifti1_io.h>
+#include "SVMPredictorWithMasks.h"
+
+using namespace std;
 
 /***************************************
 Get two parts of the brain to compute the correlation and then use the correlation vectors to predict
@@ -52,7 +57,7 @@ int SVMPredictCorrelationWithMasks(RawMatrix** r_matrices, int nSubs, const char
   for (i=nTrainings; i<nTrials; i++)
   {
     x[0].index = 0;
-    x[0].value = i-nTrainings+1;
+    x[0].value = static_cast<float>( i-nTrainings+1 );
     for (j=0; j<nTrainings; j++)
     {
       x[j+1].index = j+1;
@@ -156,7 +161,7 @@ int SVMPredictActivationWithMasks(RawMatrix** avg_matrices, int nSubs, const cha
       prob->x[i][j].index = j+1;
       int col = masked_matrices[sid]->col;
       int offset = (trials[i].sc-4)/20; //ad hoc here, for this dataset only!!!! from the block number (0 based) from starting TR
-      prob->x[i][j].value = masked_matrices[sid]->matrix[j*col+offset];
+      prob->x[i][j].value = static_cast<float>( masked_matrices[sid]->matrix[j*col+offset] );
     }
     prob->x[i][j].index = -1;
   }
@@ -171,7 +176,7 @@ int SVMPredictActivationWithMasks(RawMatrix** avg_matrices, int nSubs, const cha
       x[j].index = j+1;
       int col = masked_matrices[sid]->col;
       int offset = (trials[i].sc-4)/20; //ad hoc here, for this dataset only!!!! from the block number (0 based) from starting TR
-      x[j].value = masked_matrices[sid]->matrix[j*col+offset];
+      x[j].value = static_cast<float>( masked_matrices[sid]->matrix[j*col+offset] );
     }
     x[j].index = -1;
     double predict_label = svm_predict(model, x);

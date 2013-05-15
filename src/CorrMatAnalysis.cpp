@@ -1,7 +1,14 @@
-#include "CorrMatAnalysis.h"
-#include "Scheduler.h"
+#include <iostream>
 #include "common.h"
+#include "Scheduler.h"
+#include "CorrMatAnalysis.h"
 
+#ifdef _MSC_VER
+#	include <cmath>
+#	define isnan(x) _isnan(x)
+#endif
+
+using namespace std;
 /****************************************
 get the average correlation coefficients of correlation vectors accross blocks for every voxel
 input: the node id, the correlation matrix array (normally all belong to one subject), the number of blocks

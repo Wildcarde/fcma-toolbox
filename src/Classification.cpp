@@ -1,7 +1,10 @@
-#include "Classification.h"
+#include <iostream>
+#include "common.h"
 #include "Scheduler.h"
 #include "CorrMatAnalysis.h"
-#include "common.h"
+#include "Classification.h"
+
+using namespace std;
 
 /****************************************
 get the distance ratios between correlation vectors within the same category and across categories for every voxel
