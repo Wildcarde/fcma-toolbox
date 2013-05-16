@@ -587,7 +587,7 @@ void corrMatPreprocessing(CorrMatrix** c_matrices, int n, int nSubs)
         }
       }*/
       for (j=0; j<count; j++)
-        buf[j] = static_cast<float>( fisherTransformation(buf[j]) );
+        buf[j] = fisherTransformation(static_cast<float>( buf[j] ));
       z_score(buf, count);
       count = 0;
       for (j=0; j<n; j++)

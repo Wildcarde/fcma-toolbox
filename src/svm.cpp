@@ -3010,7 +3010,7 @@ svm_model *svm_load_model(const char *model_file_name)
 			if(val == NULL)
 				break;
 			x_space[j].index = (int) strtol(idx,&endptr,10);
-			x_space[j].value = strtod(val,&endptr);
+			x_space[j].value = static_cast<float>( strtod(val,&endptr) );
 
 			++j;
 		}

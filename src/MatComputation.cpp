@@ -27,7 +27,7 @@ int getBuf(int start_col, int end_col, int row, int col, double* mat, float* buf
 		for (j=start_col; j<=end_col; j++)
 		{
       if (sd!=0)
-			  buf[i*delta_col+j-start_col] = (mat[i*col+j] - mean) / sd; // if sd is zero, a "nan" appears
+			  buf[i*delta_col+j-start_col] = static_cast<float>( (mat[i*col+j] - mean) / sd ); // if sd is zero, a "nan" appears
       else
         buf[i*delta_col+j-start_col] = 0;
 		}
