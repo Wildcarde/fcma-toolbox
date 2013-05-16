@@ -1,5 +1,4 @@
 #include <fstream>
-#include <cblas.h>
 #include "common.h"
 #include "MatComputation.h"
 #include <iostream>

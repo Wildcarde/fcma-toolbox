@@ -1,6 +1,5 @@
-#include <nifti1_io.h>
 #include <iostream>
-#include <cblas.h>
+#include "nifti1_io.h"
 #include "common.h"
 #include "svm.h"
 #include "MatComputation.h"

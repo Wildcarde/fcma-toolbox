@@ -1,11 +1,4 @@
 #include "common.h"
-#ifdef USE_MKL
-#include <mkl_cblas.h>
-#else
-extern "C" {
-#include <cblas.h>
-}
-#endif
 #include "MatComputation.h"
 
 /*****************************

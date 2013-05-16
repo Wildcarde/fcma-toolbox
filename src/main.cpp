@@ -208,7 +208,6 @@ int main(int argc, char** argv)
   /* ----------------------------------------------- */
   /* main program begins */
   double tstart = MPI_Wtime();
-  int row = r_matrices[0]->row;
   RawMatrix** avg_matrices = NULL;
   if (taskType == 2 || taskType == 6 || taskType == 7)
   {

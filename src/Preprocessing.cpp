@@ -2,7 +2,7 @@
 #include <sstream>
 #include <fstream>
 #include <algorithm>
-#include <nifti1_io.h>
+#include "nifti1_io.h"
 #undef __USE_BSD
 #include <dirent.h>
 #include <zlib.h>
@@ -85,8 +85,8 @@ RawMatrix* ReadGzData(string fileStr, int sid)
   int row, col;
   gzread(fp, &row, sizeof(int));
   gzread(fp, &col, sizeof(int));
-  int startPos = fileStr.find_last_of('/');
-  int endPos = fileStr.find_first_of('.', startPos);
+  int startPos = static_cast<int>( fileStr.find_last_of('/') );
+  int endPos = static_cast<int>( fileStr.find_first_of('.', startPos) );
   string sname = fileStr.substr(startPos+1, endPos-startPos-1); // assuming that the subject name doesn't contain '.'
   r_matrix->sname = sname;
   r_matrix->row = row;
@@ -127,8 +127,8 @@ RawMatrix* ReadNiiGzData(string fileStr, int sid)
   cout<<"byteorder: "<<nim->byteorder<<endl;
   exit(1);*/
   RawMatrix* r_matrix = new RawMatrix();
-  int startPos = fileStr.find_last_of('/');
-  int endPos = fileStr.find_first_of('.', startPos);
+  int startPos = static_cast<int>( fileStr.find_last_of('/') );
+  int endPos = static_cast<int>( fileStr.find_first_of('.', startPos) );
   string sname = fileStr.substr(startPos+1, endPos-startPos-1); // assuming that the subject name doesn't contain '.'
   r_matrix->sname = sname;
   r_matrix->sid = sid;
@@ -408,7 +408,7 @@ output: the trial data structure array, the number of trials
 Trial* GenRegularTrials(int nSubs, int nShift, int& nTrials, const char* file)
 {
   ifstream ifile(file);
-  if (ifile==NULL)
+  if ( !ifile.is_open() )
   {
     cerr<<"no block file found!"<<endl;
     exit(1);
@@ -490,7 +490,7 @@ Trial* GenBlocksFromDir(int nSubs, int nShift, int& nTrials, RawMatrix** r_matri
     string blockFileStr = r_matrices[i]->sname + ".txt";
     blockFileStr = dirStr + blockFileStr;
     ifstream ifile(blockFileStr.c_str());
-    if (ifile==NULL)
+    if ( !ifile.is_open() )
     {
       cerr<<"no block file found!"<<endl;
       exit(1);

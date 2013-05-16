@@ -3,8 +3,8 @@
 #include "Scheduler.h"
 #include "CorrMatAnalysis.h"
 
+#include <cmath>
 #ifdef _MSC_VER
-#	include <cmath>
 #	define isnan(x) _isnan(x)
 #endif
 

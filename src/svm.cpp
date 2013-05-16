@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <iostream>
-#include <cblas.h>
+#include "common.h"
 #include "svm.h"
 
 int libsvm_version = LIBSVM_VERSION;

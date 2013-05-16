@@ -1,5 +1,4 @@
 #include <iostream>
-#include <cblas.h>
 #include "common.h"
 #include "svm.h"
 #include "SVMClassification.h"

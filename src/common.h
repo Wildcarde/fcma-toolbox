@@ -83,3 +83,15 @@ extern unsigned long long counter;
 #define LENGTHTAG 2
 #define VOXELCLASSIFIERTAG 3
 #define ELAPSETAG 4
+
+#ifdef USE_MKL
+#   include <mkl_cblas.h>
+#else
+#   ifdef __APPLE__
+#       include <Accelerate/Accelerate.h>
+#   else
+extern "C" {
+#           include <cblas.h>
+}
+#   endif
+#endif
