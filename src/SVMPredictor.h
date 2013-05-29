@@ -1,5 +1,4 @@
 #pragma once
-#include "LibSVM.h"
 
 void SVMPredict(RawMatrix** r_matrices, RawMatrix** avg_matrices, int nSubs, int nTrials, Trial* trials, int nTests, int taskType, const char* topVoxelFile, const char* mask_file);
 void CorrelationBasedClassification(int* tops, int nSubs, int nTrials, Trial* trials, int nTests, RawMatrix** r_matrices);

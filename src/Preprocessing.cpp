@@ -504,8 +504,8 @@ void corrMatPreprocessing(CorrMatrix** c_matrices, int n, int nSubs)
   int row = c_matrices[0]->step;
   int col = c_matrices[0]->nVoxels; // assume that all correlation matrices have the same size
   int i;
-  #pragma omp parallel for private(i)
   double* buf = new double[n];
+  #pragma omp parallel for private(i)
   for (i=0; i<row*col; i++)
   {
 	 memset(buf,0,n*sizeof(double));

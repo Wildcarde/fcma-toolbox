@@ -3,7 +3,6 @@
 #include <algorithm>
 #include "common.h"
 #include "svm.h"
-#include "LibSVM.h"
 #include "SVMClassification.h"
 #include "Classification.h"   // for distance ratio
 #include "Scheduler.h"

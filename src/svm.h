@@ -93,3 +93,12 @@ const char *svm_check_parameter(const struct svm_problem *prob, const struct svm
 int svm_check_probability_model(const struct svm_model *model);
 
 void svm_set_print_string_function(void (*print_func)(const char *));
+
+
+// fcma-toolbox extras
+typedef struct svm_problem SVMProblem;
+typedef struct svm_parameter SVMParameter;
+typedef struct svm_node SVMNode;
+
+void print_null(const char* s);
+SVMParameter* SetSVMParameter(int kernel_type);

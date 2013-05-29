@@ -3,7 +3,6 @@
 #include "common.h"
 #include "svm.h"
 #include "MatComputation.h"
-#include "LibSVM.h"
 #include "Preprocessing.h"
 #include "SVMPredictor.h"
 #include "SVMPredictorWithMasks.h"
