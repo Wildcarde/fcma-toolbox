@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/!svn/ver/111/trunk/examples/BandwidthTest
+END
+BandwidthTest.cc
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/111/trunk/examples/BandwidthTest/BandwidthTest.cc
+END
+kernel.cl
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/87/trunk/examples/BandwidthTest/kernel.cl
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/87/trunk/examples/BandwidthTest/Makefile
+END

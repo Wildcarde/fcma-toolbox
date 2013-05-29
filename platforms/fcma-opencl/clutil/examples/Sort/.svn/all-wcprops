@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/svn/!svn/ver/115/trunk/examples/Sort
+END
+Sort.cc
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/!svn/ver/115/trunk/examples/Sort/Sort.cc
+END
+kernel.cl
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/!svn/ver/94/trunk/examples/Sort/kernel.cl
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/!svn/ver/60/trunk/examples/Sort/Makefile
+END

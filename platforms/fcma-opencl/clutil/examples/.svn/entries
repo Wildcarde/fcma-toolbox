@@ -1,0 +1,46 @@
+10
+
+dir
+150
+http://clutil.googlecode.com/svn/trunk/examples
+http://clutil.googlecode.com/svn
+
+
+
+2013-03-25T09:07:22.822535Z
+148
+rick.weber.iii
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+d036fdd0-62f0-0f51-e489-b651f146da92
+
+ParallelFor
+dir
+
+MatrixMultiply
+dir
+
+BandwidthTest
+dir
+
+1DImage
+dir
+
+Sort
+dir
+
+DeviceInfo
+dir
+

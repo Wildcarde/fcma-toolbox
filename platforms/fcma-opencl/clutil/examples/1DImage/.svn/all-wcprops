@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/svn/!svn/ver/148/trunk/examples/1DImage
+END
+1DImage.vcxproj
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/148/trunk/examples/1DImage/1DImage.vcxproj
+END
+1DImage.cc
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/!svn/ver/107/trunk/examples/1DImage/1DImage.cc
+END
+kernel.cl
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/74/trunk/examples/1DImage/kernel.cl
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/105/trunk/examples/1DImage/Makefile
+END

@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/!svn/ver/94/trunk/Include/kernels
+END
+clUtilSort.cl
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/!svn/ver/94/trunk/Include/kernels/clUtilSort.cl
+END
+clUtilImage1D.cl
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/94/trunk/Include/kernels/clUtilImage1D.cl
+END
+clUtil.cl
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/94/trunk/Include/kernels/clUtil.cl
+END

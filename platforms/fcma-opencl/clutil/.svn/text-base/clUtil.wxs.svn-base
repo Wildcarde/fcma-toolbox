@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="47521910-3095-425E-889E-1A8E1A791D70" Name="clUtil" Language="1033" Version="1.0.0.0" Manufacturer="Rick Weber" UpgradeCode="149FA425-6268-4336-BC50-BCEFD1ABAAFC">
+        <Package Description="Test file in a Product" Comments="Simple test" InstallerVersion="200" Compressed="yes" />
+        <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFilesFolder" Name="ProgramFilesFolder">
+              <Directory Id="clUtil" Name="clUtil">
+                <Component Id="clutil_lib" DiskId="1" KeyPath="yes" Guid="757f0ef0-b495-4b94-a26a-6be187672925">
+                  <File Id="CLUTIL.LIB" Name="clutil.lib" Source="x64\Debug\clutil.lib" />
+                </Component>
+                <Directory Name="Include" Id="INCLUDE">
+                  <Component Id="include" DiskId="1" KeyPath="yes" Guid="df62d5a8-d24b-4645-9883-5d0cc2b87466">
+                    <File Id="CLUTIL.H" Name="clUtil.h" Source="Include\clUtil.h" />
+                    <File Id="CLUTIL_CORE.H" Name="clUtil_core.h" Source="Include\clUtil_core.h" />
+                    <File Id="CLUTIL_KERNEL.H" Name="clUtil_kernel.h" Source="Include\clUtil_kernel.h" />
+                    <File Id="CLUTILCOMMON.H" Name="clUtilCommon.h" Source="Include\clUtilCommon.h" />
+                    <File Id="CLUTILDEVICE.H" Name="clUtilDevice.h" Source="Include\clUtilDevice.h" />
+                    <File Id="CLUTILDEVICEGROUP.H" Name="clUtilDeviceGroup.h" Source="Include\clUtilDeviceGroup.h" />
+                    <File Id="CLUTILEXCEPTION.H" Name="clUtilException.h" Source="Include\clUtilException.h" />
+                    <File Id="CLUTILMEMORY.H" Name="clUtilMemory.h" Source="Include\clUtilMemory.h" />
+                    <File Id="CLUTILPARALLELFOR.H" Name="clUtilParallelFor.h" Source="Include\clUtilParallelFor.h" />
+                    <File Id="CLUTILPLATFORM.H" Name="clUtilPlatform.h" Source="Include\clUtilPlatform.h" />
+                    <File Id="CLUTILSCHEDULER.H" Name="clUtilScheduler.h" Source="Include\clUtilScheduler.h" />
+                    <File Id="CLUTILUTILITY.H" Name="clUtilUtility.h" Source="Include\clUtilUtility.h" />
+                  </Component>
+                  <Directory Name="kernels" Id="KERNELS">
+                    <Component Id="kernels" DiskId="1" KeyPath="yes" Guid="a9378fd9-7b34-4a73-8ce2-dfb10a241347">
+                      <File Id="CLUTIL.CL" Name="clUtil.cl" Source="Include\kernels\clUtil.cl" />
+                      <File Id="CLUTILIMAGE1D.CL" Name="clUtilImage1D.cl" Source="Include\kernels\clUtilImage1D.cl" />
+                      <File Id="CLUTILSORT.CL" Name="clUtilSort.cl" Source="Include\kernels\clUtilSort.cl" />
+                    </Component>
+                  </Directory>
+                </Directory>
+              </Directory>
+            </Directory>
+        </Directory>
+        <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
+            <ComponentRef Id="clutil_lib" />
+            <ComponentRef Id="include" />
+            <ComponentRef Id="kernels" />
+        </Feature>
+        <UI />
+    </Product>
+</Wix>

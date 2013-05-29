@@ -1,0 +1,107 @@
+K 25
+svn:wc:ra_dav:version-url
+V 23
+/svn/!svn/ver/149/trunk
+END
+clUtil.cc
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/svn/!svn/ver/148/trunk/clUtil.cc
+END
+clUtilKernel.cc
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/svn/!svn/ver/105/trunk/clUtilKernel.cc
+END
+clUtilImage.cc
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/!svn/ver/148/trunk/clUtilImage.cc
+END
+clUtilDeviceHelpers.cc
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/!svn/ver/148/trunk/clUtilDeviceHelpers.cc
+END
+clUtilPlatform.cc
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/svn/!svn/ver/101/trunk/clUtilPlatform.cc
+END
+Makefile.inc
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/svn/!svn/ver/148/trunk/Makefile.inc
+END
+clutil.vcxproj
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/!svn/ver/148/trunk/clutil.vcxproj
+END
+clutil.sln
+K 25
+svn:wc:ra_dav:version-url
+V 34
+/svn/!svn/ver/148/trunk/clutil.sln
+END
+Installer.vcxproj
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/svn/!svn/ver/148/trunk/Installer.vcxproj
+END
+clUtilDevice.cc
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/svn/!svn/ver/116/trunk/clUtilDevice.cc
+END
+clUtilParallelFor.cc
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/!svn/ver/118/trunk/clUtilParallelFor.cc
+END
+clUtilInit.cc
+K 25
+svn:wc:ra_dav:version-url
+V 36
+/svn/!svn/ver/87/trunk/clUtilInit.cc
+END
+clUtilUtility.cc
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/svn/!svn/ver/148/trunk/clUtilUtility.cc
+END
+clUtilMemory.cc
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/svn/!svn/ver/118/trunk/clUtilMemory.cc
+END
+clUtil.wxs
+K 25
+svn:wc:ra_dav:version-url
+V 34
+/svn/!svn/ver/149/trunk/clUtil.wxs
+END
+clUtilDeviceGroup.cc
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/!svn/ver/95/trunk/clUtilDeviceGroup.cc
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 32
+/svn/!svn/ver/148/trunk/Makefile
+END
