@@ -2,7 +2,7 @@
 
 #include <string>
 #define OMPI_SKIP_MPICXX
-#include <mpi.h>
+#include "mpi.h"
 
 // Matrix multiplication parameters
 #define MAXTRIAL 10000
@@ -39,24 +39,6 @@ typedef struct corr_matrix_t
   int nVoxels;  // col of this matrix
   float* matrix;
 }CorrMatrix;
-
-typedef struct param_t
-{
-  const char* fmri_directory;
-  const char* fmri_file_type;
-  const char* block_information_file;
-  const char* block_information_directory;
-  const char* mask_file1;
-  const char* mask_file2;
-  int step;
-  const char* output_file;
-  int leave_out_id;
-  int taskType;
-  int nHolds;
-  int nFolds;
-  bool isTestMode;
-  bool isUsingMaskFile;
-}Param;
 
 typedef struct trial_t  //data structure for the start and end point of a trial
 {

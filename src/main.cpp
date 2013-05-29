@@ -3,21 +3,34 @@
 #include "common.h"
 #include "Preprocessing.h"
 #include "Scheduler.h"
-#include "SVMPredictor.h"
-#include "SVMPredictorWithMasks.h"
-#include "Searchlight.h"
-#include "svm.h"
 
 using namespace std;
 
-Param Parameters;
+typedef struct param_t
+{
+    const char* fmri_directory;
+    const char* fmri_file_type;
+    const char* block_information_file;
+    const char* block_information_directory;
+    const char* mask_file1;
+    const char* mask_file2;
+    int step;
+    const char* output_file;
+    int leave_out_id;
+    int taskType;
+    int nHolds;
+    int nFolds;
+    bool isTestMode;
+    bool isUsingMaskFile;
+}Param;
+static Param Parameters;
 //extern unsigned long long counter;
 
 void exit_with_help()
 {
   printf(
   "**********************************************************\n"
-  "Usage: [OMP_NUM_THREADS=n mpirun -np n -hostfile host] ./corr-sum -d matrix_directory -m matrix_file_type -t output_file -k taskType [options]\n"
+  "Usage: [OMP_NUM_THREADS=n mpirun -np n -hostfile host] ./pni_fcma -d matrix_directory -m matrix_file_type -t output_file -k taskType [options]\n"
   "required:\n"
   "-d matrix directory, contains files in binary gz format, beginning with numbers of row and column\n"
   "-m matrix file type, usually the extension name\n"
@@ -154,14 +167,14 @@ void parse_command_line(int argc, char **argv)
 
 int main(int argc, char** argv)
 {
-  //counter=0;
   parse_command_line(argc, argv);
+
   /* Initialize MPI */
   MPI_Init(&argc, &argv);
   int me, nprocs;
   MPI_Comm_rank(MPI_COMM_WORLD, &me);
   MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-  /* initialization done */
+    
   /* ---------------------------------------------- */
   /* set a series of input arguments */
   int step = Parameters.step;
@@ -173,9 +186,11 @@ int main(int argc, char** argv)
   const char* output_file = Parameters.output_file;
   const char* mask_file1 = Parameters.mask_file1;
   const char* mask_file2 = Parameters.mask_file2;
-  int leave_out_id = Parameters.leave_out_id;
-  int nHolds = Parameters.nHolds; // the number of trials that being held from the analysis
+  
+  // the number of trials that being held from the analysis
+  int nHolds = Parameters.nHolds;
   int nFolds = Parameters.nFolds;
+    
   /* setting done */
   /* ---------------------------------------------- */
   /* data reading and initialization */
@@ -187,7 +202,6 @@ int main(int argc, char** argv)
   {
     cout<<"data reading done!"<<endl;
   }
-  Point* pts = ReadLocInfoFromNii(r_matrices[0]);  // assume that all subjects have the same format, so we can randomly pick one
   Trial* trials=NULL;
   if (block_information_file!=NULL)
   {
@@ -197,7 +211,6 @@ int main(int argc, char** argv)
   {
     trials = GenBlocksFromDir(nSubs, 0, nTrials, r_matrices, block_information_directory);  // 0 for no shift, nTrials is assigned a value here
   }
-  int nBlocksPerSub = nTrials / nSubs;  // assume each subject has the same number of blocks
   if (me == 0)
   {
     cout<<"blocks generation done! "<<nTrials<<" in total."<<endl;
@@ -205,96 +218,14 @@ int main(int argc, char** argv)
   }
   MPI_Barrier(MPI_COMM_WORLD); // wait for all nodes to finish reading the data
   /* data reading done */
+
   /* ----------------------------------------------- */
   /* main program begins */
   double tstart = MPI_Wtime();
-  RawMatrix** avg_matrices = NULL;
-  if (taskType == 2 || taskType == 6 || taskType == 7)
-  {
-    avg_matrices = rawMatPreprocessing(r_matrices, nSubs, nBlocksPerSub, trials); // 18 subjects, 12 blocks per subject
-  }
-  if (taskType != 5 && taskType != 7 && leave_out_id>=0)  // k==5 or 7 implies a cross validation
-  {
-    leaveSomeTrialsOut(trials, nTrials, leave_out_id, nHolds); // leave nHolds blocks out every time, usually 1 entire subject
-  }
-  if (Parameters.isTestMode && me == 0) // program in test mode only uses one node to predict
-  {
-    int l = 0, result = 0, f = 0;
-    cout<<"data directory: "<<fmri_directory<<endl;
-    cout<<"mask file(s): "<<mask_file1<<" "<<mask_file2<<endl;
-    cout<<"task type: "<<taskType<<endl;
-    switch (taskType)
-    {
-      case 0:
-      case 1:
-      case 2:
-      case 3:
-        SVMPredict(r_matrices, avg_matrices, nSubs, nTrials, trials, nHolds, taskType, output_file, mask_file1);
-        break;
-      case 4:
-        result = SVMPredictCorrelationWithMasks(r_matrices, nSubs, mask_file1, mask_file2, nTrials, trials, nHolds);
-        cout<<"accuracy: "<<result<<"/"<<nHolds<<"="<<result*1.0/nHolds<<endl;
-        break;
-      case 5:
-        nHolds = Parameters.nHolds;
-        while (l<=nTrials-nHolds) //assume that nHolds*an integer==nTrials
-        {
-          leaveSomeTrialsOut(trials, nTrials, 0, nHolds); // the setting of third parameter is tricky here
-          int curResult = SVMPredictCorrelationWithMasks(r_matrices, nSubs, mask_file1, mask_file2, nTrials, trials, nHolds);
-          f++;
-          cout<<"fold "<<f<<": "<<curResult<<"/"<<nHolds<<"="<<curResult*1.0/nHolds<<endl;
-          result += curResult;
-          l += nHolds;
-        }
-        cout<<"total accuracy: "<<result<<"/"<<nTrials<<"="<<result*1.0/nTrials<<endl;
-        break;
-      case 6:
-        result = SVMPredictActivationWithMasks(avg_matrices, nSubs, mask_file1, nTrials, trials, nHolds);
-        cout<<"accuracy: "<<result<<"/"<<nHolds<<"="<<result*1.0/nHolds<<endl;
-        break;
-      case 7:
-        nHolds = Parameters.nHolds;
-        while (l<=nTrials-nHolds) //assume that nHolds*an integer==nTrials
-        {
-          leaveSomeTrialsOut(trials, nTrials, 0, nHolds); // the setting of third parameter is tricky here
-          int curResult = SVMPredictActivationWithMasks(avg_matrices, nSubs, mask_file1, nTrials, trials, nHolds);
-          f++;
-          cout<<"fold "<<f<<": "<<curResult<<"/"<<nHolds<<"="<<curResult*1.0/nHolds<<endl;
-          result += curResult;
-          l += nHolds;
-        }
-        cout<<"total accuracy: "<<result<<"/"<<nTrials<<"="<<result*1.0/nTrials<<endl;
-        break;
-      default:
-        cerr<<"Unknown task type"<<endl;
-        exit_with_help();
-    }
-  }
-  else if (!Parameters.isTestMode)  //  program not in test mode is in voxel selction mode, which will use multiple nodes if doing correlation based selection
-  {
-    // compute the matrix, do analysis
-    switch (taskType)
-    {
-      case 0:
-      case 1:
-      case 3:
-        if (me==0)  // master process doesn't need to keep r_matrices
-        {
-          if (taskType==0) cout<<"SVM selecting..."<<endl;
-          if (taskType==1) cout<<"distance ratio selecting..."<<endl;
-          if (taskType==3) cout<<"correlation sum..."<<endl;
-        }
-        Scheduler(me, nprocs, step, r_matrices, taskType, trials, nTrials, nHolds, nSubs, nFolds, output_file, mask_file1, mask_file2);
-        break;
-      case 2:
-        cout<<"Searchlight selecting..."<<endl;
-        Searchlight(avg_matrices, nSubs, trials, nTrials, nHolds, nFolds, pts, output_file, mask_file1);  // doesn't need mpi
-        break;
-      default:
-        cerr<<"Unknown task type"<<endl;
-        exit_with_help();
-    }
-  }
+ 
+  cout<<"SVM selecting..."<<endl;
+  Scheduler(me, nprocs, step, r_matrices, taskType, trials, nTrials, nHolds, nSubs, nFolds, output_file, mask_file1, mask_file2);
+  
   double tstop = MPI_Wtime();
   if (me == 0)
   {
@@ -303,6 +234,7 @@ int main(int argc, char** argv)
   }
   /* main program ends */
   /* -------------------------------- */
+  
   /* Shut down MPI */
   MPI_Finalize();
   //cout<<counter<<endl;

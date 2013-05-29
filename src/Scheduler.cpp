@@ -3,8 +3,6 @@
 #include <fstream>
 #include "common.h"
 #include "MatComputation.h"
-#include "CorrMatAnalysis.h"
-#include "Classification.h"
 #include "Preprocessing.h"
 #include "SVMClassification.h"
 #include "Scheduler.h"
@@ -59,24 +57,28 @@ void DoMaster(int nprocs, int step, int row, const char* output_file)
   int sentCount = 0;
   int doneCount = 0;
   int sendMsg[2];
-  for (i=1; i<nprocs; i++)  // fill up the processes first
+
+  // fill up the processes first
+  for (i=1; i<nprocs; i++)
   {
     sendMsg[0] = curSr;
     sendMsg[1] = step;
-    if (curSr+step>row) // overflow, so only get the left
+    if (curSr+step>row)
     {
+      // overflow, so only get the left
       sendMsg[1] = row - curSr;
     }
     curSr += sendMsg[1];
-    MPI_Send(sendMsg,  /* message buffer, the correlation vector */
-           2,                  /* number of data to send */
-           MPI_INT,                       /* data item is float */
-           i,                            /* destination process rank */
-           COMPUTATIONTAG,                      /* user chosen message tag */
-           MPI_COMM_WORLD);                 /* default communicator */
+    MPI_Send(sendMsg,
+           2,
+           MPI_INT,
+           i, 
+           COMPUTATIONTAG, 
+           MPI_COMM_WORLD);
     sentCount++;
   }
-  VoxelScore* scores = new VoxelScore[row];  // one voxel one score
+  // one voxel one score
+  VoxelScore* scores = new VoxelScore[row];
   int totalLength = 0;
   MPI_Status status;
   while (sentCount < total)
@@ -86,27 +88,27 @@ void DoMaster(int nprocs, int step, int row, const char* output_file)
     // get the elapse time
     MPI_Recv(&elapse,      /* message buffer */
            1,              /* numbers of data to receive */
-           MPI_FLOAT,          /* of type float real */
-           MPI_ANY_SOURCE,                       /* receive from any sender */
-           ELAPSETAG,              /* user chosen message tag */
-           MPI_COMM_WORLD,          /* default communicator */
-           &status);                /* info about the received message */
+           MPI_FLOAT,      /* of type float real */
+           MPI_ANY_SOURCE, /* receive from any sender */
+           ELAPSETAG,      /* user chosen message tag */
+           MPI_COMM_WORLD, /* default communicator */
+           &status);       /* info about the received message */
     // get the length of message first
-    MPI_Recv(&curLength,      /* message buffer */
-           1,              /* numbers of data to receive */
-           MPI_INT,          /* of type float real */
-           status.MPI_SOURCE,       /* receive from any sender */
-           LENGTHTAG,              /* user chosen message tag */
-           MPI_COMM_WORLD,          /* default communicator */
-           &status);                /* info about the received message */
+    MPI_Recv(&curLength,
+           1,
+           MPI_INT,
+           status.MPI_SOURCE,
+           LENGTHTAG,
+           MPI_COMM_WORLD,
+           &status);
     // get the classifier array
-    MPI_Recv(scores+totalLength,      /* message buffer */
-           curLength*2,              /* numbers of data to receive */
-           MPI_FLOAT,          /* of type float real */
-           status.MPI_SOURCE,                       /* receive from the previous sender */
-           VOXELCLASSIFIERTAG,              /* user chosen message tag */
-           MPI_COMM_WORLD,          /* default communicator */
-           &status);                /* info about the received message */
+    MPI_Recv(scores+totalLength,
+           curLength*2,
+           MPI_FLOAT,
+           status.MPI_SOURCE,
+           VOXELCLASSIFIERTAG,
+           MPI_COMM_WORLD,
+           &status);
     totalLength += curLength;
     doneCount++;
     cout.precision(4);
@@ -122,12 +124,12 @@ void DoMaster(int nprocs, int step, int row, const char* output_file)
       sendMsg[1] = row - curSr;
     }
     curSr += sendMsg[1];
-    MPI_Send(sendMsg,  /* message buffer, the correlation vector */
-           2,                  /* number of data to send */
-           MPI_INT,                       /* data item is float */
-           status.MPI_SOURCE,             /* destination process rank */
-           COMPUTATIONTAG,                      /* user chosen message tag */
-           MPI_COMM_WORLD);                 /* default communicator */
+    MPI_Send(sendMsg,
+           2,
+           MPI_INT,
+           status.MPI_SOURCE, 
+           COMPUTATIONTAG,
+           MPI_COMM_WORLD);
     sentCount++;
   }
   while (doneCount < total)
@@ -135,29 +137,29 @@ void DoMaster(int nprocs, int step, int row, const char* output_file)
     int curLength;
     float elapse;
     // get the elapse time
-    MPI_Recv(&elapse,      /* message buffer */
-           1,              /* numbers of data to receive */
-           MPI_FLOAT,          /* of type float real */
-           MPI_ANY_SOURCE,                       /* receive from any sender */
-           ELAPSETAG,              /* user chosen message tag */
-           MPI_COMM_WORLD,          /* default communicator */
-           &status);                /* info about the received message */
+    MPI_Recv(&elapse,
+           1,
+           MPI_FLOAT,
+           MPI_ANY_SOURCE,
+           ELAPSETAG, 
+           MPI_COMM_WORLD,
+           &status);
     // get the length of message first
-    MPI_Recv(&curLength,      /* message buffer */
-           1,              /* numbers of data to receive */
-           MPI_INT,          /* of type float real */
-           status.MPI_SOURCE,      /* receive from any sender */
-           LENGTHTAG,              /* user chosen message tag */
-           MPI_COMM_WORLD,          /* default communicator */
-           &status);                /* info about the received message */
+    MPI_Recv(&curLength,
+           1,
+           MPI_INT,
+           status.MPI_SOURCE,
+           LENGTHTAG,
+           MPI_COMM_WORLD,
+           &status);
     // get the classifier array
-    MPI_Recv(scores+totalLength,      /* message buffer */
-           curLength*2,              /* numbers of data to receive */
-           MPI_FLOAT,          /* of type float real */
-           status.MPI_SOURCE,                       /* receive from any sender */
-           VOXELCLASSIFIERTAG,              /* user chosen message tag */
-           MPI_COMM_WORLD,          /* default communicator */
-           &status);                /* info about the received message */
+    MPI_Recv(scores+totalLength,
+           curLength*2, 
+           MPI_FLOAT, 
+           status.MPI_SOURCE,
+           VOXELCLASSIFIERTAG,
+           MPI_COMM_WORLD, 
+           &status);
     totalLength += curLength;
     doneCount++;
     cout.precision(4);
@@ -172,12 +174,12 @@ void DoMaster(int nprocs, int step, int row, const char* output_file)
     sendMsg[0] = -1;
     sendMsg[1] = -1;
     curSr += step;
-    MPI_Send(sendMsg,  /* message buffer, the correlation vector */
-           2,                  /* number of data to send */
-           MPI_INT,                       /* data item is float */
-           i,                            /* destination process rank */
-           COMPUTATIONTAG,                      /* user chosen message tag */
-           MPI_COMM_WORLD);                 /* default communicator */
+    MPI_Send(sendMsg,
+           2,
+           MPI_INT,
+           i,
+           COMPUTATIONTAG,
+           MPI_COMM_WORLD);
   }
   sort(scores, scores+totalLength, cmp);
   cout<<"Total length: "<<totalLength<<endl;
@@ -199,13 +201,13 @@ void DoSlave(int me, int masterId, RawMatrix** matrices1, RawMatrix** matrices2,
   MPI_Status status;
   while (true)
   {
-    MPI_Recv(recvMsg,      /* message buffer */
-           2,              /* numbers of data to receive */
-           MPI_INT,          /* of type float real */
-           masterId,                       /* receive from any sender */
-           COMPUTATIONTAG,              /* user chosen message tag */
-           MPI_COMM_WORLD,          /* default communicator */
-           &status);                /* info about the received message */
+    MPI_Recv(recvMsg,
+           2,
+           MPI_INT, 
+           masterId, 
+           COMPUTATIONTAG,
+           MPI_COMM_WORLD,
+           &status);
     double tstart = MPI_Wtime();
     int sr = recvMsg[0];
     int step = recvMsg[1];
@@ -215,45 +217,31 @@ void DoSlave(int me, int masterId, RawMatrix** matrices1, RawMatrix** matrices2,
     }
     CorrMatrix** c_matrices = ComputeAllTrialsCorrMatrices(trials, nTrials, sr, step, matrices1, matrices2);
     VoxelScore* scores = NULL;
-    switch (taskType)
-    {
-      case 0:
-        // Fisher transform and z-score (across the blocks) the data here
-        corrMatPreprocessing(c_matrices, nTrials, nSubs);
-        scores = GetSVMPerformance(me, c_matrices, nTrials-nHolds, nFolds);
-        break;
-      case 1:
-        // Fisher transform and z-score (across the blocks) the data here
-        corrMatPreprocessing(c_matrices, nTrials, nSubs);
-        scores = GetDistanceRatio(me, c_matrices, nTrials-nHolds);
-        break;
-      case 3:
-				scores = GetCorrVecSum(me, c_matrices, nTrials);
-				break;
-      default:
-        cerr<<"unknown task type"<<endl;
-        exit(1);
-    }
+
+    // Fisher transform and z-score (across the blocks) the data here
+    corrMatPreprocessing(c_matrices, nTrials, nSubs);
+    scores = GetSVMPerformance(me, c_matrices, nTrials-nHolds, nFolds);
+
     double tstop = MPI_Wtime();
     float elapse = float(tstop-tstart);
-    MPI_Send(&elapse,  /* message buffer, the correlation vector */
-           1,                  /* number of data to send */
-           MPI_FLOAT,                       /* data item is float */
-           masterId,                            /* destination process rank */
-           ELAPSETAG,                      /* user chosen message tag */
-           MPI_COMM_WORLD);                 /* default communicator */
-    MPI_Send(&(c_matrices[0]->step),  /* message buffer, the correlation vector */
-           1,                  /* number of data to send */
-           MPI_INT,                       /* data item is float */
-           masterId,                            /* destination process rank */
-           LENGTHTAG,                      /* user chosen message tag */
-           MPI_COMM_WORLD);                 /* default communicator */
-    MPI_Send(scores,  /* message buffer, the correlation vector */
-           c_matrices[0]->step*2,                  /* number of data to send */
-           MPI_FLOAT,                       /* data item is float */
-           masterId,                            /* destination process rank */
-           VOXELCLASSIFIERTAG,                      /* user chosen message tag */
-           MPI_COMM_WORLD);                 /* default communicator */
+    MPI_Send(&elapse,
+           1,
+           MPI_FLOAT,
+           masterId,
+           ELAPSETAG,
+           MPI_COMM_WORLD);
+    MPI_Send(&(c_matrices[0]->step),
+           1,
+           MPI_INT,
+           masterId,
+           LENGTHTAG,
+           MPI_COMM_WORLD); 
+    MPI_Send(scores, 
+           c_matrices[0]->step*2,
+           MPI_FLOAT,
+           masterId,
+           VOXELCLASSIFIERTAG, 
+           MPI_COMM_WORLD);
     delete scores;
     int i;
     for (i=0; i<nTrials; i++)

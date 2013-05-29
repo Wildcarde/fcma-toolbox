@@ -3,6 +3,7 @@
 /*
  * Typedefs
  */
+#include <cstddef>
 typedef int MPI_Fint;
 typedef ptrdiff_t MPI_Aint;
 typedef long long MPI_Offset;

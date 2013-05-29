@@ -56,51 +56,10 @@ RawMatrix** ReadGzDirectory(const char* filepath, const char* filetype, int& nSu
   sort(strFilenames, strFilenames+count);
   for (int i=0; i<count; i++)
   {
-    //cout<<strFilenames[i]<<endl; // output the file name to know the file sequance
-    //r_matrices[i] = ReadGzData(strFilenames[i], i);
     r_matrices[i] = ReadNiiGzData(strFilenames[i], i);
   }
   closedir(pDir);
   return r_matrices;
-}
-
-
-/*************************
-read matrix data from gz files, the first eight bytes are two 32-bit ints, indicating the row and col of the following matrix
-input: the gz file name, subject id
-output: the raw matrix data
-**************************/
-RawMatrix* ReadGzData(string fileStr, int sid)
-{
-  const char* file = fileStr.c_str();
-  gzFile fp = gzopen(file, "rb");
-  //cout<<sid+1<<": "<<file<<endl;
-  if (fp == NULL)
-  {
-    cout<<"file not found: "<<file<<endl;
-    exit(1);
-  }
-  RawMatrix* r_matrix = new RawMatrix();
-  r_matrix->sid = sid;
-  int row, col;
-  gzread(fp, &row, sizeof(int));
-  gzread(fp, &col, sizeof(int));
-  int startPos = static_cast<int>( fileStr.find_last_of('/') );
-  int endPos = static_cast<int>( fileStr.find_first_of('.', startPos) );
-  string sname = fileStr.substr(startPos+1, endPos-startPos-1); // assuming that the subject name doesn't contain '.'
-  r_matrix->sname = sname;
-  r_matrix->row = row;
-  r_matrix->col = col;
-  r_matrix->matrix = new double[row*col];
-  uint16* data = new uint16[row*col];
-  gzread(fp, data, row*col*sizeof(uint16));
-  for (int i=0; i<row*col; i++) // not efficient
-  {
-    r_matrix->matrix[i] = (double)data[i];  // transpose, because data is time (row) * voxel (column), r_matrix wants voxel (row) * time (column)
-  }
-  gzclose(fp);
-  delete data;
-  return r_matrix;
 }
 
 /*************************
@@ -200,7 +159,9 @@ int AlignMatrices(RawMatrix** r_matrices, int nSubs, Point* pts)
   {
     flags[i] = true;
   }
-  for (i=0; i<nSubs; i++) // get the zll-zero conditions, store in flags, false means at least one subject contains all-zeros
+    
+  // get the zll-zero conditions, store in flags, false means at least one subject contains all-zeros
+  for (i=0; i<nSubs; i++)
   {
     int col = r_matrices[i]->col;
     double* mat = r_matrices[i]->matrix;
@@ -215,14 +176,6 @@ int AlignMatrices(RawMatrix** r_matrices, int nSubs, Point* pts)
     }
   }
   int count=0;
-  /*ofstream ofile("masks.txt");  // for outputting mask file
-  for (i=0; i<row; i++)
-  {
-    if (flags[i]) ofile<<"1 ";
-    else ofile<<"0 ";
-  }
-  ofile.close();
-  exit(1);*/
   for (i=0; i<nSubs; i++) // remove the all-zero voxels
   {
     int col = r_matrices[i]->col;
@@ -247,21 +200,7 @@ int AlignMatrices(RawMatrix** r_matrices, int nSubs, Point* pts)
       count++;
     }
   }
-  // one-time rearrange the location information and new location file writing
-  /*count = 0;
-  for (j=0; j<row; j++)
-  {
-    if (flags[j])
-    {
-      memcpy(&(pts[count]), &(pts[j]), 3*sizeof(int));
-      count++;
-    }
-  }
-  FILE *fp = fopen("/memex/yidawang/neuroscience/data/Abby/Parity_Magnitude/location_new.bin", "wb");
-  fwrite((void*)&count, sizeof(int), 1, fp);
-  fwrite((void*)pts, sizeof(int), 3*count, fp);
-  fclose(fp);
-  exit(1);*/
+
   delete [] flags;
   return count;
 }
@@ -278,9 +217,11 @@ int AlignMatricesByFile(RawMatrix** r_matrices, int nSubs, const char* file, Poi
   int i, j;
   int count=0;
   nifti_image* nim;
-  nim = nifti_image_read(file, 1);  // for inputting mask file
+  // for inputting mask file
+  nim = nifti_image_read(file, 1);
   short* data = NULL;
-  switch (nim->datatype)  // now only get one type
+  // now only get one type
+  switch (nim->datatype)  
   {
     case DT_SIGNED_SHORT:
       data = (short*)nim->data;
@@ -302,7 +243,8 @@ int AlignMatricesByFile(RawMatrix** r_matrices, int nSubs, const char* file, Poi
         count++;
       }
     }
-    r_matrices[i]->row = count; // update the row information
+    // update the row information
+    r_matrices[i]->row = count;
   }
   count = 0;
   for (j=0; j<row; j++)
@@ -336,7 +278,6 @@ RawMatrix** GetMaskedMatrices(RawMatrix** r_matrices, int nSubs, const char* mas
   short* data_short = NULL;
   unsigned char* data_uchar = NULL;
   float* data_float = NULL;
-  //cout<<nim->nx<<" "<<nim->ny<<" "<<nim->nz<<endl; exit(1);
   switch (nim->datatype)  // now only get one type
   {
     case DT_SIGNED_INT:
@@ -355,7 +296,8 @@ RawMatrix** GetMaskedMatrices(RawMatrix** r_matrices, int nSubs, const char* mas
       cerr<<"wrong data type of mask file!"<<endl;
       exit(1);
   }
-  for (i=0; i<nSubs; i++) // get only the masked voxels
+  // get only the masked voxels
+  for (i=0; i<nSubs; i++)
   {
     RawMatrix* masked_matrix = new RawMatrix();
     masked_matrix->sid = r_matrices[i]->sid;
@@ -415,13 +357,15 @@ Trial* GenRegularTrials(int nSubs, int nShift, int& nTrials, const char* file)
   }
   int nPerSubs = -1;
   ifile>>nPerSubs;
-  Trial* trials = new Trial[nSubs*nPerSubs];  //12 trials per subject
-  int* trial_labels = new int[nPerSubs];// = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
-  int* scs = new int[nPerSubs];// = {4, 24, 44, 64, 84, 104, 124, 144, 164, 184, 204, 224};
-  int* ecs = new int[nPerSubs];// = {15, 35, 55, 75, 95, 115, 135, 155, 175, 195, 215, 235};
-  //int trial_labels[6] = {0, 1, 0, 1, 0, 1};
-  //int scs[6] = {4, 24, 84, 104, 164, 184};
-  //int ecs[6] = {15, 35, 95, 115, 175, 195};
+  Trial* trials = new Trial[nSubs*nPerSubs]; // **** EXAMPLE 12 trials per subject ****
+  int* trial_labels = new int[nPerSubs]; // = {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1};
+  int* scs = new int[nPerSubs]; // = {4, 24, 44, 64, 84, 104, 124, 144, 164, 184, 204, 224};
+  int* ecs = new int[nPerSubs]; // = {15, 35, 55, 75, 95, 115, 135, 155, 175, 195, 215, 235};
+  // **** EXAMPLE 6 trials per subject ****
+  // int trial_labels[6] = {0, 1, 0, 1, 0, 1};
+  // int scs[6] = {4, 24, 84, 104, 164, 184};
+  // int ecs[6] = {15, 35, 95, 115, 175, 195};
+  
   int i, j;
   for (i=0; i<nPerSubs; i++)
   {
